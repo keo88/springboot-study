@@ -13,4 +13,9 @@ public class IndexController {
 	public String getIndex() {
 		return "Hello World";
 	}
+
+	@GetMapping("/health-check")
+	public String healthCheck() {
+		return "OK";
+	}
 }
