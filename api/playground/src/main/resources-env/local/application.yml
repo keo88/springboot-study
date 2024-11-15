@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://192.168.1.6:5432/test
-    username: ncpadmin
-    password: ncpadmin
+    url: jdbc:postgresql://localhost:5432/test
+    username: user
+    password:
     driver-class-name: org.postgresql.Driver
