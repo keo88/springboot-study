@@ -35,6 +35,7 @@ public class SpringSecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(authorize ->
 			authorize.requestMatchers(WhitelistPath.getPaths()).permitAll()
+				.anyRequest().authenticated()
 		);
 
 		return http.build();
