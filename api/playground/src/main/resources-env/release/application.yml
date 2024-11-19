@@ -4,3 +4,11 @@ spring:
     username: ncpadmin
     password: ncpadmin
     driver-class-name: org.postgresql.Driver
+
+logging:
+  level:
+    org:
+      hibernate:
+      SQL: debug
+      descriptor:
+        sql: trace
