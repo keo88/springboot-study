@@ -8,10 +8,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,9 +21,8 @@ import lombok.Setter;
 public class Member {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member_seq_generator")
-	@SequenceGenerator(name = "member_seq_generator", sequenceName = "member_id_seq", allocationSize = 1)
-	private Long id;
+	@GeneratedValue
+	private Integer id;
 
 	@Column(nullable = false)
 	private String name;
