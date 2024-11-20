@@ -1,6 +1,8 @@
 package com.keokim.playground.base.alias;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -8,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -38,5 +41,8 @@ public class Member {
 
 	@Column(name = "last_login_at")
 	private LocalDateTime lastLoginAt;
+
+	@OneToMany(mappedBy = "member")
+	private List<PurchaseOrder> purchaseOrders = new ArrayList<>();
 
 }
