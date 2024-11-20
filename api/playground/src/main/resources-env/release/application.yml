@@ -5,10 +5,13 @@ spring:
     password: ncpadmin
     driver-class-name: org.postgresql.Driver
 
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
 logging:
   level:
     org:
       hibernate:
-      SQL: debug
-      descriptor:
-        sql: trace
+        SQL: debug
+        orm.jdbc.bind: trace
