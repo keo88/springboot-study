@@ -1,9 +1,12 @@
 package com.keokim.playground.base.alias;
 
+import java.time.LocalDateTime;
+
 import com.keokim.playground.base.alias.item.Item;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -22,11 +25,11 @@ public class OrderItem {
 	@GeneratedValue
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_id")
 	private Item item;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "purchase_order_id")
 	private PurchaseOrder purchaseOrder;
 
@@ -35,4 +38,7 @@ public class OrderItem {
 
 	@Column
 	private Integer count;
+
+	@Column(name = "created_at", nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	private LocalDateTime createdAt;
 }
