@@ -8,13 +8,13 @@ import org.springframework.stereotype.Repository;
 import com.keokim.playground.base.alias.Member;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 
 @Repository
+@RequiredArgsConstructor
 public class MemberRepository {
 
-	@PersistenceContext
-	private EntityManager em;
+	private final EntityManager em;
 
 	public void save(Member member) {
 		em.persist(member);
