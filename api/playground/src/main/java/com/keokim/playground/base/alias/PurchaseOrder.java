@@ -34,7 +34,7 @@ public class PurchaseOrder {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "delivery_id")
 	private Delivery delivery;
 
@@ -46,5 +46,20 @@ public class PurchaseOrder {
 
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
+
+	public void setDelivery(Delivery delivery) {
+		this.delivery = delivery;
+		delivery.setPurchaseOrder(this);
+	}
+
+	public void addOrderItem(OrderItem orderItem) {
+		orderItem.setPurchaseOrder(this);
+		orderItems.add(orderItem);
+	}
+
+	public void setOrderItems(List<OrderItem> orderItems) {
+		this.orderItems = orderItems;
+		orderItems.forEach(orderItem -> orderItem.setPurchaseOrder(this));
+	}
 
 }
