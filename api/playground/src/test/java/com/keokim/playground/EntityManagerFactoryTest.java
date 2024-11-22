@@ -1,6 +1,7 @@
 package com.keokim.playground;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,7 +51,7 @@ public class EntityManagerFactoryTest {
 
 		final TypedQuery<Member> query = entityManager.createQuery("select m from Member m where name='Test1'", Member.class);
 
-		Assertions.assertEquals(newMember, query.getSingleResult());
+		assertEquals(newMember, query.getSingleResult());
 	}
 
 	@Test
@@ -69,7 +70,7 @@ public class EntityManagerFactoryTest {
 			entityManager.persist(member);
 			entityManager.persist(order);
 			final TypedQuery<Member> query = entityManager.createQuery("select m from Member m", Member.class);
-			Assertions.assertEquals(member, query.getSingleResult());
+			assertEquals(member, query.getSingleResult());
 			transaction.commit();
 		} finally {
 			entityManager.close();
@@ -95,13 +96,13 @@ public class EntityManagerFactoryTest {
 
 		entityManager.persist(purchaseOrder);
 
-		Assertions.assertNotNull(delivery.getId());
+		assertNotNull(delivery.getId());
 		TypedQuery<Delivery> query = entityManager.createQuery("SELECT d FROM Delivery d WHERE d.purchaseOrder = ?1", Delivery.class);
 		query.setParameter(1, purchaseOrder);
 		Delivery foundDelivery = query.getSingleResult();
 
-		Assertions.assertEquals(delivery, foundDelivery);
-		Assertions.assertEquals(purchaseOrder.getDelivery(), foundDelivery);
+		assertEquals(delivery, foundDelivery);
+		assertEquals(purchaseOrder.getDelivery(), foundDelivery);
 	}
 
 	@Transactional
@@ -122,7 +123,7 @@ public class EntityManagerFactoryTest {
 		entityManager.persist(purchaseOrder);
 		entityManager.persist(delivery);
 
-		Assertions.assertNotNull(member.getId());
+		assertNotNull(member.getId());
 	}
 
 }
