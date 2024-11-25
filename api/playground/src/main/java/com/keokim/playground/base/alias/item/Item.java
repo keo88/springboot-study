@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.keokim.playground.base.alias.Category;
+import com.keokim.playground.exception.NotEnoughStockException;
 
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
@@ -32,4 +33,18 @@ public abstract class Item {
 
 	@ManyToMany(mappedBy = "items")
 	private List<Category> categories = new ArrayList<>();
+
+	public void addStock(int quantity) {
+		stockQuantity += quantity;
+	}
+
+	public void removeStock(int quantity) {
+		int remainingStock = stockQuantity - quantity;
+
+		if (remainingStock < 0) {
+			throw new NotEnoughStockException("Need more stock for item name " + name);
+		}
+
+		stockQuantity = remainingStock;
+	}
 }
