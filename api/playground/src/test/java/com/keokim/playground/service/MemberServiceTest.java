@@ -28,7 +28,7 @@ class MemberServiceTest {
 	@Test
 	void testFindById() {
 		Member member = new Member();
-		member.setId(1);
+		member.setId(1L);
 		member.setName("Test1");
 
 		when(memberRepository.findById(1)).thenReturn(Optional.of(member));
@@ -39,11 +39,11 @@ class MemberServiceTest {
 	@Test
 	void testFindMembers() {
 		Member member1 = new Member();
-		member1.setId(1);
+		member1.setId(1L);
 		member1.setName("Test1");
 
 		Member member2 = new Member();
-		member2.setId(2);
+		member2.setId(2L);
 		member2.setName("Test2");
 
 		List<Member> members = List.of(member1, member2);
@@ -60,11 +60,11 @@ class MemberServiceTest {
 		String newName = "Test2";
 
 		Member presentMember = new Member();
-		presentMember.setId(1);
+		presentMember.setId(1L);
 		presentMember.setName(presentName);
 
 		Member newMember = new Member();
-		newMember.setId(2);
+		newMember.setId(2L);
 		newMember.setName(newName);
 
 		when(memberRepository.findByName(newName)).thenReturn(new ArrayList<>());
@@ -79,11 +79,11 @@ class MemberServiceTest {
 		String duplicatedName = "Test1";
 
 		Member presentMember = new Member();
-		presentMember.setId(1);
+		presentMember.setId(1L);
 		presentMember.setName(duplicatedName);
 
 		Member newMember = new Member();
-		newMember.setId(2);
+		newMember.setId(2L);
 		newMember.setName(duplicatedName);
 
 		when(memberRepository.findByName(duplicatedName)).thenReturn(List.of(presentMember));

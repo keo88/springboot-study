@@ -1,6 +1,7 @@
 package com.keokim.playground.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +28,8 @@ public class ItemService {
 		return itemRepository.findAll();
 	}
 
-	public Item findById(long id) {
-		return itemRepository.findOne(id);
+	public Optional<Item> findById(long id) {
+		return itemRepository.findById(id);
 	}
 
 }

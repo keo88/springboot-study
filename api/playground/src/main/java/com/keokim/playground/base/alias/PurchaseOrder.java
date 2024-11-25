@@ -2,6 +2,7 @@ package com.keokim.playground.base.alias;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -47,6 +48,16 @@ public class PurchaseOrder {
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 
+	public static PurchaseOrder createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
+		PurchaseOrder order = new PurchaseOrder();
+		order.setMember(member);
+		order.setDelivery(delivery);
+		Arrays.stream(orderItems).forEach(order::addOrderItem);
+		order.setStatus(OrderStatus.ORDER);
+
+		return order;
+	}
+
 	public void setDelivery(Delivery delivery) {
 		this.delivery = delivery;
 		delivery.setPurchaseOrder(this);
@@ -57,9 +68,24 @@ public class PurchaseOrder {
 		orderItems.add(orderItem);
 	}
 
-	public void setOrderItems(List<OrderItem> orderItems) {
-		this.orderItems = orderItems;
-		orderItems.forEach(orderItem -> orderItem.setPurchaseOrder(this));
+	public void setMember(Member member) {
+		this.member = member;
+		member.getPurchaseOrders().add(this);
+	}
+
+	public void cancel() {
+		if (delivery.getStatus() == DeliveryStatus.COMP) {
+			throw new IllegalStateException("Delivery has already been cancelled");
+		}
+
+		this.setStatus(OrderStatus.CANCEL);
+		orderItems.forEach(OrderItem::cancel);
+	}
+
+	public int getTotalPrice() {
+		return orderItems.stream()
+			.mapToInt(OrderItem::getTotalPrice)
+			.sum();
 	}
 
 }

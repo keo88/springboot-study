@@ -1,6 +1,7 @@
 package com.keokim.playground.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -15,16 +16,18 @@ public class ItemRepository {
 
 	private final EntityManager em;
 
-	public void save(Item item) {
+	public Item save(Item item) {
 		if (item.getId() == null) {
 			em.persist(item);
 		} else {
 			em.merge(item);
 		}
+
+		return item;
 	}
 
-	public Item findOne(Long id) {
-		return em.find(Item.class, id);
+	public Optional<Item> findById(Long id) {
+		return Optional.ofNullable(em.find(Item.class, id));
 	}
 
 	public List<Item> findAll() {
