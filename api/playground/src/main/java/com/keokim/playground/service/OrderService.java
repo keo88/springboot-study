@@ -1,5 +1,7 @@
 package com.keokim.playground.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +11,7 @@ import com.keokim.playground.base.alias.Member;
 import com.keokim.playground.base.alias.OrderItem;
 import com.keokim.playground.base.alias.PurchaseOrder;
 import com.keokim.playground.base.alias.item.Item;
+import com.keokim.playground.base.alias.param.OrderSearch;
 import com.keokim.playground.repository.OrderRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -43,5 +46,9 @@ public class OrderService {
 	public void cancelOrder(long orderId) {
 		PurchaseOrder cancelOrder = orderRepository.findById(orderId).orElseThrow(RuntimeException::new);
 		cancelOrder.cancel();
+	}
+
+	public List<PurchaseOrder> findAll(OrderSearch orderSearch) {
+		return orderRepository.findAll(orderSearch);
 	}
 }
