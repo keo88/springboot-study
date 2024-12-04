@@ -78,7 +78,22 @@ class OrderRepositoryTest {
 
 	@Test
 	public void testFindById() {
+		Member member = getMember("Member");
 
+		Delivery delivery = getDelivery();
+
+		Book item = getBook(10000, 100);
+
+		OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), item.getStockQuantity());
+
+		PurchaseOrder order = PurchaseOrder.createOrder(member, delivery, orderItem);
+
+		orderRepository.save(order);
+		entityManager.flush();
+
+		PurchaseOrder foundOrder = orderRepository.findById(order.getId()).orElse(null);
+		assertNotNull(foundOrder, "Order should be found.");
+		assertEquals(member, order.getMember(), "Member should match.");
 	}
 
 	@Test
@@ -115,5 +130,7 @@ class OrderRepositoryTest {
 		assertEquals(2, result1.size(), "Order should be found.");
 		assertEquals(1, result2.size(), "Order should be found.");
 		assertEquals(0, result3.size(), "Order should not be found.");
+
+
 	}
 }

@@ -15,7 +15,7 @@ public class IndexController {
 	public String getIndex(Model model) {
 		model.addAttribute("username", "손님");
 
-		return "index";
+		return "home";
 	}
 
 	@ResponseBody

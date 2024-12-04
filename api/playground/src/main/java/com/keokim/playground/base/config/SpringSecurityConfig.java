@@ -2,6 +2,7 @@ package com.keokim.playground.base.config;
 
 import java.util.Arrays;
 
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,7 +23,8 @@ public class SpringSecurityConfig {
 		INDEX("/"),
 		HEALTH("/health-check"),
 		LOGIN("/member/login"),
-		LOGOUT("/member/logout");
+		LOGOUT("/member/logout"),
+		CSS("/static/css/bootstrap.min.css");
 
 		private final String path;
 
@@ -34,7 +36,9 @@ public class SpringSecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(authorize ->
-			authorize.requestMatchers(WhitelistPath.getPaths()).permitAll()
+			authorize
+				.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+				.requestMatchers(WhitelistPath.getPaths()).permitAll()
 				.anyRequest().authenticated()
 		);
 
