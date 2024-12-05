@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.keokim.playground.base.alias.Member;
+import com.keokim.playground.base.dto.MemberForm;
 import com.keokim.playground.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,20 +57,15 @@ class MemberServiceTest {
 
 	@Test
 	void testJoin() {
-		String presentName = "Test1";
-		String newName = "Test2";
+		String newName = "Test1";
 
-		Member presentMember = new Member();
-		presentMember.setId(1L);
-		presentMember.setName(presentName);
-
-		Member newMember = new Member();
-		newMember.setId(2L);
-		newMember.setName(newName);
+		MemberForm newMemberForm = new MemberForm();
+		newMemberForm.setName(newName);
+		newMemberForm.setPassword("password");
 
 		when(memberRepository.findByName(newName)).thenReturn(new ArrayList<>());
 
-		memberService.join(newMember);
+		memberService.join(newMemberForm);
 
 		verify(memberRepository, times(1)).findByName(newName);
 	}
@@ -82,13 +78,13 @@ class MemberServiceTest {
 		presentMember.setId(1L);
 		presentMember.setName(duplicatedName);
 
-		Member newMember = new Member();
-		newMember.setId(2L);
-		newMember.setName(duplicatedName);
+		MemberForm newMemberForm = new MemberForm();
+		newMemberForm.setName(duplicatedName);
+		newMemberForm.setPassword("password");
 
 		when(memberRepository.findByName(duplicatedName)).thenReturn(List.of(presentMember));
 
-		assertThrows(IllegalStateException.class, () -> memberService.join(newMember));
+		assertThrows(IllegalStateException.class, () -> memberService.join(newMemberForm));
 
 		verify(memberRepository, times(1)).findByName(duplicatedName);
 	}

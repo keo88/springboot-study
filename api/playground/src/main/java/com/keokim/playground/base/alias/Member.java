@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.keokim.playground.base.dto.MemberForm;
 
 import jakarta.persistence.Column;
@@ -50,10 +52,12 @@ public class Member {
 	@OneToMany(mappedBy = "member")
 	private List<PurchaseOrder> purchaseOrders = new ArrayList<>();
 
-	public static Member of(MemberForm memberForm) {
+
+
+	public static Member of(MemberForm memberForm, PasswordEncoder passwordEncoder) {
 		return Member.builder()
 			.name(memberForm.getName())
-			.password(memberForm.getPassword())
+			.password(passwordEncoder.encode(memberForm.getPassword()))
 			.address(new Address(memberForm.getCity(), memberForm.getStreet(), memberForm.getZipcode()))
 			.build();
 	}
