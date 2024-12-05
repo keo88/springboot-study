@@ -22,9 +22,7 @@ public class SpringSecurityConfig {
 
 		INDEX("/"),
 		HEALTH("/health-check"),
-		LOGIN("/member/login"),
-		LOGOUT("/member/logout"),
-		CSS("/static/css/bootstrap.min.css");
+		MEMBER("/member/**");
 
 		private final String path;
 
