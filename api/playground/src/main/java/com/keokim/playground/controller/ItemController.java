@@ -39,4 +39,10 @@ public class ItemController {
 
 		return "redirect:/item";
 	}
+
+	@GetMapping("/item")
+	public String list(Model model) {
+		model.addAttribute("items", itemService.findItems());
+		return "item/itemList";
+	}
 }
