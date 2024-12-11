@@ -28,6 +28,7 @@
             <p th:if="${#fields.hasErrors('password')}"
                th:errors="*{password}">Incorrect password</p>
         </div>
+        <p th:if="${error}" th:text="'로그인에 실패했습니다. 아이디와 비밀번호를 확인해 주세요.'"></p>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
     <br/>
