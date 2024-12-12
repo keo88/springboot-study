@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.keokim.playground.base.alias.Member;
 import com.keokim.playground.base.alias.item.Item;
+import com.keokim.playground.base.alias.param.OrderSearch;
 import com.keokim.playground.base.dto.OrderForm;
 import com.keokim.playground.service.ItemService;
 import com.keokim.playground.service.MemberService;
@@ -45,7 +46,14 @@ public class OrderController {
 		}
 
 		orderService.createOrder(orderForm.getMemberId(), orderForm.getItemId(), orderForm.getCount());
-		return "redirect:/";
+		return "redirect:/order";
+	}
+
+	@GetMapping("/order/list")
+	public String orderList(Model model, OrderSearch orderSearch) {
+		model.addAttribute("orders", orderService.findAll(orderSearch));
+		model.addAttribute("orderSearch", orderSearch);
+		return "order/orderList";
 	}
 
 	private void hydrateModel(OrderForm orderForm, Model model) {

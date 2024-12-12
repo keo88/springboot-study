@@ -39,7 +39,7 @@ public class PurchaseOrder {
 	@JoinColumn(name = "delivery_id")
 	private Delivery delivery;
 
-	@OneToMany(mappedBy = "purchaseOrder")
+	@OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
 	private List<OrderItem> orderItems = new ArrayList<>();
 
 	@Column(name = "created_at", nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
