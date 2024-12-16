@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NCP 서버 자료</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        naver: {
+                            DEFAULT: '#00d25a',
+                            500: '#00d25a',
+                            400: '#66e49c'
+                        },
+                        naverBlue: '#117ce9'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white h-screen w-screen p-4">
+<header class="flex justify-end gap-2 text-sm text-white mb-4">
+    <button id="refreshButton" class="flex justify-center w-10 items-center bg-white border shadow border-naver hover:bg-gray-100 duration-300 rounded aspect-square p-2.5">
+        ♻️
+    </button>
+    <button id="createButton" class="bg-naver shadow hover:bg-naver-400 duration-300 rounded px-5 py-2.5">
+        + 서버 생성
+    </button>
+</header>
+<main class="relative bg-gray-50 p-2 rounded-lg overflow-hidden">
+    <table class="w-full">
+        <thead class='rounded-lg font-medium text-gray-600 text-left text-sm font-normal'>
+        <tr>
+            <th scope="col" class='px-3 py-5'>ID</th>
+            <th scope="col" class='px-3 py-5'>Name</th>
+            <th scope="col" class='px-3 py-5'>Status</th>
+            <th scope="col" class='px-3 py-5'>Start</th>
+            <th scope="col" class='px-3 py-5'>Stop</th>
+            <th scope="col" class='px-3 py-5'>Reboot</th>
+            <th scope="col" class='px-3 py-5'>Terminate</th>
+        </tr>
+        </thead>
+        <tbody id="table" class="rounded-lg bg-white">
+        <tr class='w-full border-b border-b py-3 text-xs last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg'
+            th:each="server : ${serverList}" th:data-status="${server.serverInstanceStatus.code}"
+            th:data-pending="${server.serverInstanceOperation.code != 'NULL'}">
+            <td class='whitespace-nowrap py-3 px-3' th:text="${server.serverInstanceNo}"></td>
+            <td class='whitespace-nowrap py-3 px-3' th:text="${server.serverName}"></td>
+            <td class='whitespace-nowrap py-3 px-3' th:text="${server.serverInstanceStatus.code}"></td>
+            <td class='whitespace-nowrap py-3 px-3 w-10'>
+                <button class="disabled:text-gray-400 hover:text-naver" th:data-id="${server.serverInstanceNo}">
+                    시작
+                </button>
+            </td>
+            <td class='whitespace-nowrap py-3 px-3 w-10'>
+                <button class="disabled:text-gray-400 hover:text-naver" th:data-id="${server.serverInstanceNo}">
+                    정지
+                </button>
+            </td>
+            <td class='whitespace-nowrap py-3 px-3 w-10'>
+                <button class="disabled:text-gray-400 hover:text-naver" th:data-id="${server.serverInstanceNo}">
+                    재시작
+                </button>
+            </td>
+            <td class='whitespace-nowrap py-3 px-3 w-10'>
+                <button class="disabled:text-gray-400 hover:text-naver" th:data-id="${server.serverInstanceNo}">
+                    삭제
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+<footer class="py-2 text-sm text-gray-600">
+    <a href="/members/logout" class="hover:underline">로그아웃</a>
+</footer>
+</body>
+<script defer th:src="main.js">
+</script>
+</html>

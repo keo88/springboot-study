@@ -2,3 +2,4 @@ rootProject.name = 'springboot'
 
 include 'module:module-domain'
 include 'api:playground'
+include 'api:ncphw'

@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title th:text="${buttonText}">회원가입</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        naver: {
+                            DEFAULT: '#00d25a',
+                            500: '#00d25a',
+                            400: '#66e49c'
+                        },
+                        naverBlue: '#117ce9'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="p-4">
+    <form th:action="${actionUrl}" action="/members/new" method="post" class="flex flex-col gap-2">
+        <div class="bg-gray-50 rounded-lg p-2 grid grid-cols-[minmax(4rem,8rem)_1fr] gap-2">
+            <label for="username">이름</label>
+            <input type="text" id="username" name="username" placeholder="이름을 입력하세요" class="flex-1 border">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" class="flex-1 border">
+        </div>
+        <div class="flex justify-end gap-2">
+            <a th:href="${altUrl}" th:text="${altText}" class="self-end text-gray-600 hover:text-gray-400 hover:underline duration-300 shadow rounded border border-gray-300 px-4 py-2">로그인</a>
+            <button th:text="${buttonText}" class="self-end text-white bg-naver shadow hover:bg-naver-400 duration-300 rounded px-4 py-2" type="submit">등록</button>
+        </div>
+    </form>
+</div> <!-- /container -->
+</body>
+</html>

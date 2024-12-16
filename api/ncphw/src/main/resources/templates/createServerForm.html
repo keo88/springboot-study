@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NCP 서버 생성</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        naver: {
+                            DEFAULT: '#00d25a',
+                            500: '#00d25a',
+                            400: '#66e49c'
+                        },
+                        naverBlue: '#117ce9'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        #serverNameInput {
+            color: black;
+            border: 1px black solid;
+        }
+        #serverNameInput:invalid {
+            color: darkred;
+            border: 1px darkred solid;
+        }
+        #serverNameInput:invalid {
+            &::after {
+                content: 'Min : 3, Max : 30\n소문자, 숫자, "-"의 특수문자만 허용하며 알파벳 문자로 시작함\n영어 또는 숫자로 끝남';
+                display: block;
+                width: 12px;
+                height: 12px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white h-screen w-screen px-4 overflow-y-auto">
+<form action="/server/create" method="post" class="flex flex-col gap-2">
+    <header class="sticky bg-white border-b border-b-gray-30 top-0 py-4 flex justify-end text-sm text-white mb-4">
+        <button id="createButton" class="bg-naver shadow hover:bg-naver-400 duration-300 rounded px-5 py-2.5">
+            생성하기
+        </button>
+    </header>
+    <div class="bg-gray-50 rounded-lg p-2 flex gap-2">
+        <label for="serverNameInput">이름</label>
+        <input required pattern="^[a-z][a-z0-9\-]{1,28}[a-z0-9]$" id="serverNameInput" type="text" name="serverName" class="flex-1 rounded" />
+    </div>
+    <fieldset>
+        <legend>프로덕트 선택</legend>
+        <ul id="productList" class="overflow-y-auto h-40 rounded border border-gray-30 px-2">
+            <li th:each="product : ${productList}" class="flex gap-2">
+                <input required th:id="${product.getProductCode()}" type="radio" th:value="${product.getProductCode()}" name="productCode" />
+                <label th:for="${product.getProductCode()}" th:text="${product.getProductName()}"></label>
+            </li>
+        </ul>
+    </fieldset>
+    <fieldset>
+        <legend>VPC 선택</legend>
+        <ul id="vpcList" class="overflow-y-auto max-h-20 rounded border border-gray-30 px-2">
+            <li th:each="vpc : ${vpcList}" class="flex gap-2">
+                <input required th:id="${vpc.getVpcNo()}" type="radio" th:value="${vpc.getVpcNo()}" name="vpcNo" />
+                <label th:for="${vpc.getVpcNo()}" th:text="${vpc.getVpcName()}"></label>
+            </li>
+        </ul>
+    </fieldset>
+    <fieldset>
+        <legend>Subnet 선택</legend>
+        <div id="subnetLists" class="flex flex-col overflow-y-auto max-h-20 rounded border border-gray-30 px-2">
+            <ul th:each="subnetList : ${vpcSubnetsList}">
+                <li th:each="subnet : ${subnetList}" th:data-parentVpcNo="${subnet.getVpcNo()}">
+                    <input required th:id="${subnet.getSubnetNo()}" type="radio" th:value="${subnet.getSubnetNo()}" name="subnetNo" />
+                    <label th:for="${subnet.getSubnetNo()}" th:text="${subnet.getSubnetName()}"></label>
+                </li>
+            </ul>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Acg 선택</legend>
+        <div id="acgLists" class="overflow-y-auto max-h-20 flex flex-col rounded border border-gray-30 px-2">
+            <ul th:each="acgList : ${vpcAcgList}">
+                <li th:each="acg : ${acgList}" th:data-parentVpcNo="${acg.getVpcNo()}">
+                    <input th:id="${acg.getAccessControlGroupNo()}" type="radio" th:value="${acg.getAccessControlGroupNo()}" name="acgNo" />
+                    <label th:for="${acg.getAccessControlGroupNo()}" th:text="${acg.getAccessControlGroupName()}"></label>
+                </li>
+            </ul>
+        </div>
+    </fieldset>
+</form>
+</body>
+<script defer src="/createServerForm.js"></script>
+</html>

@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: hello-spring
+  datasource:
+    url: jdbc:mysql://223.130.156.135:3306/hello_spring_db
+    username: keo
+    password: ab1664!1
+    driver-class-name: com.mysql.cj.jdbc.Driver
+logging:
+  level:
+    root: INFO
+    reactor.netty.http.client: DEBUG
+external:
+  api:
+    accessKey: QOSYncpev8FDqSQxQSNP
+    secretKey: w1aLWlSD1o4FwWc8bwof6XFMbrbhfN2B1vOiG7CH
