@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.keokim.playground.base.alias.Member;
@@ -54,6 +55,12 @@ public class OrderController {
 		model.addAttribute("orders", orderService.findAll(orderSearch));
 		model.addAttribute("orderSearch", orderSearch);
 		return "order/orderList";
+	}
+
+	@PostMapping("/order/{orderId}/cancel")
+	public String cancelOrder(@PathVariable("orderId") Long orderId) {
+		orderService.cancelOrder(orderId);
+		return "redirect:/order/list";
 	}
 
 	private void hydrateModel(OrderForm orderForm, Model model) {
