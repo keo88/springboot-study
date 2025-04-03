@@ -1,0 +1,33 @@
+bootJar {
+    enabled = true
+}
+
+jar {
+    enabled = false
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'org.apache.commons:commons-lang3'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
+
+final String DEFAULT_PROFILE = 'local'
+
+
+if (!project.hasProperty('profile') || !profile) {
+    ext.profile = DEFAULT_PROFILE
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir "src/main/resources"
+            srcDir "src/main/resources-env/${profile}"
+        }
+    }
+}

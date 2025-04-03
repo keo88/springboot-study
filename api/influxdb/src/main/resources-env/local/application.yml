@@ -1,0 +1,5 @@
+influx:
+  url: http://223.130.151.160:8086
+  token: token
+  org: navercorp
+  bucket: test

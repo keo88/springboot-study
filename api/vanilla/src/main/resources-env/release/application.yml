@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    active: real
+    include:
+      - common
+  datasource:
+    url: jdbc:postgresql://192.168.1.6:5432/test
+    username: ncpadmin
+    password: ncpadmin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+#      ddl-auto: validate
+      ddl-auto: none
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        orm.jdbc.bind: trace
