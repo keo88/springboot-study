@@ -26,7 +26,7 @@ public class JdbcMemberRepository implements MemberRepository {
     public Member save(Member member) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        String sql = "insert into users (username, password) values (?, ?)";
+        String sql = "insert into member (username, password) values (?, ?)";
         jdbcTemplate.update(conn -> {
             PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, member.getUsername());
@@ -39,7 +39,7 @@ public class JdbcMemberRepository implements MemberRepository {
 
     @Override
     public Optional<Member> findById(Long id) {
-        String sql = "select * from users where user_id = ?";
+        String sql = "select * from member where user_id = ?";
         Member member;
         try {
             member = jdbcTemplate.queryForObject(sql, memberRowMapper, id);
@@ -53,7 +53,7 @@ public class JdbcMemberRepository implements MemberRepository {
 
     @Override
     public Optional<Member> findByName(String name) {
-        String sql = "select * from users where username = ?";
+        String sql = "select * from member where username = ?";
         Member member;
         try {
             member = jdbcTemplate.queryForObject(sql, memberRowMapper, name);
@@ -65,7 +65,7 @@ public class JdbcMemberRepository implements MemberRepository {
 
     @Override
     public Optional<Member> findByNameAndPassword(String name, String password) {
-        String sql = "select * from users where username = ? and password = ?";
+        String sql = "select * from member where username = ? and password = ?";
         Member member;
         try {
             member = jdbcTemplate.queryForObject(sql, memberRowMapper, name, password);
@@ -77,7 +77,7 @@ public class JdbcMemberRepository implements MemberRepository {
 
     @Override
     public List<Member> findAll() {
-        String sql = "select * from users";
+        String sql = "select * from member";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Member.class));
     }
 
