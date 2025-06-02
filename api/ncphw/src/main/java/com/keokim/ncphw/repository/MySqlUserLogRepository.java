@@ -22,7 +22,7 @@ public class MySqlUserLogRepository implements UserLogRepository {
     public LogMessage save(LogMessage message) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        String sql = "insert into user_logs (user_id, message) values (?, ?)";
+        String sql = "insert into log_message (user_id, message) values (?, ?)";
         jdbcTemplate.update(conn -> {
             PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setLong(1, message.getUserId());
