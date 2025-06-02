@@ -24,7 +24,7 @@ public class MySqlUserLogRepository implements UserLogRepository {
 
         String sql = "insert into log_message (user_id, message) values (?, ?)";
         jdbcTemplate.update(conn -> {
-            PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = conn.prepareStatement(sql, new String[]{"log_id"});
             ps.setLong(1, message.getUserId());
             ps.setString(2, message.getMessage());
             return ps;
