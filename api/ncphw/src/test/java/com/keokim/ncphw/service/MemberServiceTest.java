@@ -1,93 +1,87 @@
 package com.keokim.ncphw.service;
 
-import com.keokim.ncphw.domain.Member;
-
-import com.keokim.ncphw.repository.MemoryMemberRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.keokim.ncphw.domain.Member;
+import com.keokim.ncphw.repository.MemoryMemberRepository;
 
 class MemberServiceTest {
 
-    class MockRepository extends MemoryMemberRepository {
-        private Member savedMember;
+	private final MockRepository repository = new MockRepository();
+	private final MemberService memberService = new MemberService(repository, new BCryptPasswordEncoder());
 
-        @Override
-        public Member save(Member member) {
-            savedMember = member;
-            savedMember.setUserId(1L);
-            return member;
-        }
+	@BeforeEach
+	void beforeEach() {
+		repository.clear();
+	}
 
-        @Override
-        public Optional<Member> findByName(String name) {
-            if (savedMember == null) {
-                return Optional.empty();
-            }
-            else {
-                return Optional.of(savedMember);
-            }
-        }
+	@Test
+	void join() {
 
-        @Override
-        public Optional<Member> findById(Long id) {
-            if (savedMember == null) {
-                return Optional.empty();
-            }
-            else
-                return Optional.of(savedMember);
-        }
+		Member member1 = new Member();
+		member1.setUsername("member1");
 
-        public void clear() {
-            savedMember = null;
-        }
-    }
+		memberService.join(member1);
 
-    private final MockRepository repository = new MockRepository();
+		assertEquals(memberService.findById(member1.getUserId()), member1);
+	}
 
-    private MemberService memberService = new MemberService(repository);
+	@Test
+	void duplicateJoin() {
+		Member member1 = new Member();
+		member1.setUsername("member1");
 
-    @BeforeEach
-    void beforeEach() {
-        repository.clear();
-    }
+		Member member2 = new Member();
+		member2.setUsername("member1");
 
+		memberService.join(member1);
 
-    @Test
-    void join() {
+		assertThrows(IllegalStateException.class, () -> memberService.join(member2));
+	}
 
-        Member member1 = new Member();
-        member1.setUsername("member1");
+	@Test
+	void findAll() {
+	}
 
-        memberService.join(member1);
+	@Test
+	void findById() {
+	}
 
-        assertEquals(memberService.findById(member1.getUserId()), member1);
-    }
+	static class MockRepository extends MemoryMemberRepository {
+		private Member savedMember;
 
-    @Test
-    void  duplicateJoin() {
-        MockRepository mockRepository = new MockRepository();
-        memberService = new MemberService(mockRepository);
-        Member member1 = new Member();
-        member1.setUsername("member1");
+		@Override
+		public Member save(Member member) {
+			savedMember = member;
+			savedMember.setUserId(1L);
+			return member;
+		}
 
-        Member member2 = new Member();
-        member2.setUsername("member1");
+		@Override
+		public Optional<Member> findByName(String name) {
+			if (savedMember == null) {
+				return Optional.empty();
+			} else {
+				return Optional.of(savedMember);
+			}
+		}
 
+		@Override
+		public Optional<Member> findById(Long id) {
+			if (savedMember == null) {
+				return Optional.empty();
+			} else
+				return Optional.of(savedMember);
+		}
 
-        memberService.join(member1);
-
-        assertThrows(IllegalStateException.class, () -> memberService.join(member2));
-    }
-
-    @Test
-    void findAll() {
-    }
-
-    @Test
-    void findById() {
-    }
+		public void clear() {
+			savedMember = null;
+		}
+	}
 }

@@ -4,8 +4,6 @@ import org.springframework.stereotype.Component;
 
 import com.rabbitmq.client.ConnectionFactory;
 
-import lombok.RequiredArgsConstructor;
-
 @Component
 public class TestProducer extends Producer {
 
@@ -13,8 +11,9 @@ public class TestProducer extends Producer {
 		super(connectionFactory, new QueueDeclaration("testQueue"));
 	}
 
-	public void sendTestMessage(String message) {
-		produce(message);
+	@Override
+	public void produce(String message) {
+		super.produce(message);
 	}
 
 }

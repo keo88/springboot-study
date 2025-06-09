@@ -2,6 +2,10 @@ spring:
     profiles:
         include:
         - common
+    rabbitmq:
+        host: 223.130.140.56
+        username: admin
+        password: admin
 
     datasource:
         url: jdbc:postgresql://223.130.151.160:5432/hello_spring_db
