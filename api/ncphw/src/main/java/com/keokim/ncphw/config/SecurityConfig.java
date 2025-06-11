@@ -74,7 +74,8 @@ public class SecurityConfig {
 	enum WhitelistPath {
 
 		HEALTH_CHECK("/health-check"),
-		MEMBERS("/members/**");
+		MEMBERS("/members/**"),
+		AMQP("/amqp/**");
 
 		private final String path;
 

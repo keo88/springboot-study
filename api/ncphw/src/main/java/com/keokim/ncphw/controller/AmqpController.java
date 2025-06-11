@@ -11,16 +11,16 @@ import com.keokim.ncphw.queue.TestProducer;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/test")
+@RequestMapping("/amqp")
 @RestController
 @RequiredArgsConstructor
-public class TestController {
+public class AmqpController {
 
 	private final TestProducer testProducer;
 
 	@GetMapping("/message")
-	public NcpHwResponse<?> produce(@NotNull @RequestParam String message) {
-		testProducer.produce(message);
+	public NcpHwResponse<?> produce(@NotNull @RequestParam String cont) {
+		testProducer.produce(cont);
 		return NcpHwResponse.success();
 	}
 }
