@@ -42,7 +42,7 @@ jobs:
         echo "📦 Processing payload from repository_dispatch..."
         
         # 페이로드 파일 생성 (GitHub이 환경 변수로 전달)
-        echo '${{ github.event.client_payload }}' > payload.json
+        echo '${{ toJSON(github.event.client_payload) }}' > payload.json
         
         # 페이로드 내용 확인
         echo "📄 Received payload:"
