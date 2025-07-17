@@ -9,7 +9,7 @@ on:
 env:
   TARGET_REPO: 'keo88/universal-cursor-rules'
   TARGET_BRANCH: 'main'
-  LOCAL_BRANCH: 'develop'
+  LOCAL_BRANCH: 'main'
   RULES_DIR: '.cursor/rules'
   SOURCE_DIR: 'java'
   
