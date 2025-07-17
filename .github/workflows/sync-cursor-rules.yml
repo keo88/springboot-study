@@ -1,33 +1,35 @@
 name: Auto Sync Cursor Rules
 
 on:
+  # 소스 리포지토리로부터 파일 데이터 수신
   repository_dispatch:
     types: [cursor-rules-updated]
   
+  # 수동 실행 옵션
   workflow_dispatch:
 
 env:
-  TARGET_REPO: 'keo88/universal-cursor-rules'
-  TARGET_BRANCH: 'main'
-  LOCAL_BRANCH: 'main'
-  RULES_DIR: '.cursor/rules'
-  SOURCE_DIR: 'java'
+  LOCAL_BRANCH: 'main'           # 로컬 타겟 브랜치
+  RULES_DIR: '.cursor/rules'        # 로컬 저장 경로
   
-  # 복사할 파일 패턴 (공백으로 구분)
-  FILE_PATTERNS: '*.mdc *.md'
+  # 필터링 설정 (필요한 것만 선택)
+  INCLUDE_DIRECTORIES: 'java'           # 예: 'python frontend/react' (공백 구분)
+  INCLUDE_PATTERNS: '*.mdc'         # 예: '*.mdc *.md' (공백 구분)  
+  INCLUDE_TAGS: ''                  # 예: 'python react' (공백 구분)
+  EXCLUDE_PATTERNS: ''             # 예: 'temp_*.mdc draft_*.md' (공백 구분)
 
 jobs:
   sync-cursor-rules:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout and sync
+    - name: Checkout repository
       uses: actions/checkout@v4
       with:
         ref: ${{ env.LOCAL_BRANCH }}
         token: ${{ secrets.GITHUB_TOKEN }}
     
-    - name: Download and apply rules
+    - name: Process and apply rules
       run: |
         # Git 설정
         git config user.name 'github-actions[bot]'
@@ -36,56 +38,111 @@ jobs:
         # 타겟 디렉토리 생성
         mkdir -p ${{ env.RULES_DIR }}
         
-        # 소스 디렉토리 경로 설정
-        if [ -n "${{ env.SOURCE_DIR }}" ]; then
-          SOURCE_PATH="${{ env.SOURCE_DIR }}"
-          echo "Syncing from source directory: $SOURCE_PATH"
-        else
-          SOURCE_PATH=""
-          echo "Syncing from repository root"
-        fi
+        # 페이로드에서 파일 정보 추출
+        echo "📦 Processing payload from repository_dispatch..."
         
-        # 파일 패턴 배열로 변환
-        IFS=' ' read -ra PATTERNS <<< "${{ env.FILE_PATTERNS }}"
+        # 페이로드 파일 생성 (GitHub이 환경 변수로 전달)
+        echo '${{ github.event.client_payload }}' > payload.json
         
-        # 각 패턴에 대해 파일 다운로드
-        for pattern in "${PATTERNS[@]}"; do
-          echo "Downloading files matching pattern: $pattern"
+        # 페이로드 내용 확인
+        echo "📄 Received payload:"
+        cat payload.json | jq .
+        
+        # 필터링 조건 설정
+        INCLUDE_DIRS="${{ env.INCLUDE_DIRECTORIES }}"
+        INCLUDE_PATS="${{ env.INCLUDE_PATTERNS }}"
+        INCLUDE_TAGS_LIST="${{ env.INCLUDE_TAGS }}"
+        EXCLUDE_PATS="${{ env.EXCLUDE_PATTERNS }}"
+        
+        echo "🔍 Filtering rules:"
+        echo "  Include directories: $INCLUDE_DIRS"
+        echo "  Include patterns: $INCLUDE_PATS"
+        echo "  Include tags: $INCLUDE_TAGS_LIST"
+        echo "  Exclude patterns: $EXCLUDE_PATS"
+        
+        # 파일 필터링 및 저장
+        echo "📝 Applying filtered rules..."
+        
+        # jq로 파일 배열 순회
+        cat payload.json | jq -c '.files[]' | while read -r file; do
+          # 파일 정보 추출
+          name=$(echo "$file" | jq -r '.name')
+          path=$(echo "$file" | jq -r '.path')
+          directory=$(echo "$file" | jq -r '.directory')
+          content=$(echo "$file" | jq -r '.content')
+          tags=$(echo "$file" | jq -r '.tags[]?' | tr '\n' ' ')
           
-          # API 경로 설정
-          if [ -n "$SOURCE_PATH" ]; then
-            API_URL="https://api.github.com/repos/${{ env.TARGET_REPO }}/contents/$SOURCE_PATH"
-          else
-            API_URL="https://api.github.com/repos/${{ env.TARGET_REPO }}/contents"
+          echo "  → Processing: $name (dir: $directory)"
+          
+          # 필터링 로직
+          should_include=true
+          
+          # 1. 디렉토리 필터링
+          if [ -n "$INCLUDE_DIRS" ]; then
+            match_found=false
+            for dir in $INCLUDE_DIRS; do
+              if [[ "$directory" == "$dir"* ]] || [[ "$directory" == "root" && "$dir" == "." ]]; then
+                match_found=true
+                break
+              fi
+            done
+            if [ "$match_found" = false ]; then
+              should_include=false
+              echo "    ❌ Directory filter: $directory not in [$INCLUDE_DIRS]"
+            fi
           fi
           
-          # 파일 목록 가져오기 (패턴 매칭)
-          FILES=$(curl -s \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "$API_URL" \
-            | jq -r --arg pattern "$pattern" '.[] | select(.type == "file" and (.name | test($pattern | gsub("\\*"; ".*") | gsub("\\?"; ".")))) | .name')
-          
-          # 파일 다운로드
-          for file in $FILES; do
-            if [ -n "$file" ]; then
-              echo "  → Downloading: $file"
-              
-              if [ -n "$SOURCE_PATH" ]; then
-                DOWNLOAD_URL="https://api.github.com/repos/${{ env.TARGET_REPO }}/contents/$SOURCE_PATH/$file"
-              else
-                DOWNLOAD_URL="https://api.github.com/repos/${{ env.TARGET_REPO }}/contents/$file"
+          # 2. 파일 패턴 필터링 (포함)
+          if [ "$should_include" = true ] && [ -n "$INCLUDE_PATS" ]; then
+            match_found=false
+            for pattern in $INCLUDE_PATS; do
+              if [[ "$name" == $pattern ]]; then
+                match_found=true
+                break
               fi
-              
-              curl -s \
-                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                -H "Accept: application/vnd.github.v3.raw" \
-                "$DOWNLOAD_URL" \
-                -o "${{ env.RULES_DIR }}/$file"
+            done
+            if [ "$match_found" = false ]; then
+              should_include=false
+              echo "    ❌ Pattern filter: $name not matching [$INCLUDE_PATS]"
             fi
-          done
+          fi
+          
+          # 3. 태그 필터링
+          if [ "$should_include" = true ] && [ -n "$INCLUDE_TAGS_LIST" ]; then
+            match_found=false
+            for tag in $INCLUDE_TAGS_LIST; do
+              if [[ "$tags" == *"$tag"* ]]; then
+                match_found=true
+                break
+              fi
+            done
+            if [ "$match_found" = false ]; then
+              should_include=false
+              echo "    ❌ Tag filter: [$tags] not containing [$INCLUDE_TAGS_LIST]"
+            fi
+          fi
+          
+          # 4. 제외 패턴 필터링
+          if [ "$should_include" = true ] && [ -n "$EXCLUDE_PATS" ]; then
+            for pattern in $EXCLUDE_PATS; do
+              if [[ "$name" == $pattern ]]; then
+                should_include=false
+                echo "    ❌ Exclude pattern: $name matching $pattern"
+                break
+              fi
+            done
+          fi
+          
+          # 파일 저장
+          if [ "$should_include" = true ]; then
+            echo "    ✅ Including: $name"
+            echo "$content" > "${{ env.RULES_DIR }}/$name"
+          else
+            echo "    ⏭️  Skipping: $name"
+          fi
         done
         
-        # 다운로드된 파일 확인
+        # 결과 확인
         echo "📁 Files in ${{ env.RULES_DIR }}:"
         ls -la ${{ env.RULES_DIR }}/ || echo "No files found"
         
@@ -93,14 +150,23 @@ jobs:
         git add ${{ env.RULES_DIR }}
         
         if ! git diff --cached --quiet; then
-          git commit -m "🔄 Auto-sync cursor rules from ${{ env.TARGET_REPO }}
+          # 소스 정보 추출
+          source_repo=$(echo '${{ github.event.client_payload }}' | jq -r '.commit.sha // "unknown"')
+          source_commit=$(echo '${{ github.event.client_payload }}' | jq -r '.commit.sha // "unknown"')
           
-          Source: ${{ env.TARGET_REPO }}/${{ env.SOURCE_DIR || 'root' }}
-          Patterns: ${{ env.FILE_PATTERNS }}
-          Branch: ${{ env.TARGET_BRANCH }} → ${{ env.LOCAL_BRANCH }}"
+          git commit -m "🔄 Auto-sync filtered cursor rules
+
+          Source commit: $source_commit
+          Filters applied:
+          - Directories: $INCLUDE_DIRS
+          - Patterns: $INCLUDE_PATS  
+          - Tags: $INCLUDE_TAGS_LIST
+          - Exclude: $EXCLUDE_PATS
+          
+          Files updated: $(ls ${{ env.RULES_DIR }}/ | wc -l)"
           
           git push origin ${{ env.LOCAL_BRANCH }}
           echo "✅ Changes committed and pushed to ${{ env.LOCAL_BRANCH }}"
         else
-          echo "ℹ️ No changes detected"
+          echo "ℹ️ No changes detected after filtering"
         fi
