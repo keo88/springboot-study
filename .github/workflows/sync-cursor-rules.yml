@@ -46,6 +46,7 @@ jobs:
         
         # 페이로드 내용 확인
         echo "📄 Received payload:"
+        cat payload.json
         cat payload.json | jq .
         
         # 필터링 조건 설정
