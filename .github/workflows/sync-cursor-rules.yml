@@ -42,11 +42,10 @@ jobs:
         echo "📦 Processing payload from repository_dispatch..."
         
         # 페이로드 파일 생성 (GitHub이 환경 변수로 전달)
-        echo '${{ toJSON(github.event.client_payload) }}' > payload.json
+        echo '${{ github.event.client_payload }}' > payload.json
         
         # 페이로드 내용 확인
         echo "📄 Received payload:"
-        cat payload.json
         cat payload.json | jq .
         
         # 필터링 조건 설정
@@ -151,9 +150,9 @@ jobs:
         git add ${{ env.RULES_DIR }}
         
         if ! git diff --cached --quiet; then
-          # 소스 정보 추출
-          source_repo=$(echo '${{ github.event.client_payload }}' | jq -r '.commit.sha // "unknown"')
-          source_commit=$(echo '${{ github.event.client_payload }}' | jq -r '.commit.sha // "unknown"')
+          # 소스 정보 추출 (이미 생성된 payload.json 사용)
+          source_repo=$(cat payload.json | jq -r '.commit.sha // "unknown"')
+          source_commit=$(cat payload.json | jq -r '.commit.sha // "unknown"')
           
           git commit -m "🔄 Auto-sync filtered cursor rules
 
