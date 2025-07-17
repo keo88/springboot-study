@@ -8,6 +8,10 @@ on:
   # 수동 실행 옵션
   workflow_dispatch:
 
+permissions:
+  contents: write    # 파일 수정 및 커밋
+  actions: read      # 워크플로우 실행
+
 env:
   LOCAL_BRANCH: 'main'           # 로컬 타겟 브랜치
   RULES_DIR: '.cursor/rules'        # 로컬 저장 경로
