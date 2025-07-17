@@ -1,0 +1,106 @@
+name: Auto Sync Cursor Rules
+
+on:
+  repository_dispatch:
+    types: [cursor-rules-updated]
+  
+  workflow_dispatch:
+
+env:
+  TARGET_REPO: 'keo88/universal-cursor-rules'
+  TARGET_BRANCH: 'main'
+  LOCAL_BRANCH: 'develop'
+  RULES_DIR: '.cursor/rules'
+  SOURCE_DIR: 'java'
+  
+  # 복사할 파일 패턴 (공백으로 구분)
+  FILE_PATTERNS: '*.mdc *.md'
+
+jobs:
+  sync-cursor-rules:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout and sync
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.LOCAL_BRANCH }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Download and apply rules
+      run: |
+        # Git 설정
+        git config user.name 'github-actions[bot]'
+        git config user.email 'github-actions[bot]@users.noreply.github.com'
+        
+        # 타겟 디렉토리 생성
+        mkdir -p ${{ env.RULES_DIR }}
+        
+        # 소스 디렉토리 경로 설정
+        if [ -n "${{ env.SOURCE_DIR }}" ]; then
+          SOURCE_PATH="${{ env.SOURCE_DIR }}"
+          echo "Syncing from source directory: $SOURCE_PATH"
+        else
+          SOURCE_PATH=""
+          echo "Syncing from repository root"
+        fi
+        
+        # 파일 패턴 배열로 변환
+        IFS=' ' read -ra PATTERNS <<< "${{ env.FILE_PATTERNS }}"
+        
+        # 각 패턴에 대해 파일 다운로드
+        for pattern in "${PATTERNS[@]}"; do
+          echo "Downloading files matching pattern: $pattern"
+          
+          # API 경로 설정
+          if [ -n "$SOURCE_PATH" ]; then
+            API_URL="https://api.github.com/repos/${{ env.TARGET_REPO }}/contents/$SOURCE_PATH"
+          else
+            API_URL="https://api.github.com/repos/${{ env.TARGET_REPO }}/contents"
+          fi
+          
+          # 파일 목록 가져오기 (패턴 매칭)
+          FILES=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "$API_URL" \
+            | jq -r --arg pattern "$pattern" '.[] | select(.type == "file" and (.name | test($pattern | gsub("\\*"; ".*") | gsub("\\?"; ".")))) | .name')
+          
+          # 파일 다운로드
+          for file in $FILES; do
+            if [ -n "$file" ]; then
+              echo "  → Downloading: $file"
+              
+              if [ -n "$SOURCE_PATH" ]; then
+                DOWNLOAD_URL="https://api.github.com/repos/${{ env.TARGET_REPO }}/contents/$SOURCE_PATH/$file"
+              else
+                DOWNLOAD_URL="https://api.github.com/repos/${{ env.TARGET_REPO }}/contents/$file"
+              fi
+              
+              curl -s \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                -H "Accept: application/vnd.github.v3.raw" \
+                "$DOWNLOAD_URL" \
+                -o "${{ env.RULES_DIR }}/$file"
+            fi
+          done
+        done
+        
+        # 다운로드된 파일 확인
+        echo "📁 Files in ${{ env.RULES_DIR }}:"
+        ls -la ${{ env.RULES_DIR }}/ || echo "No files found"
+        
+        # 변경사항 커밋 및 푸시
+        git add ${{ env.RULES_DIR }}
+        
+        if ! git diff --cached --quiet; then
+          git commit -m "🔄 Auto-sync cursor rules from ${{ env.TARGET_REPO }}
+          
+          Source: ${{ env.TARGET_REPO }}/${{ env.SOURCE_DIR || 'root' }}
+          Patterns: ${{ env.FILE_PATTERNS }}
+          Branch: ${{ env.TARGET_BRANCH }} → ${{ env.LOCAL_BRANCH }}"
+          
+          git push origin ${{ env.LOCAL_BRANCH }}
+          echo "✅ Changes committed and pushed to ${{ env.LOCAL_BRANCH }}"
+        else
+          echo "ℹ️ No changes detected"
+        fi
